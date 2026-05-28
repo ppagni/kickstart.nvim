@@ -12,6 +12,7 @@ return {
     },
     {
         'willothy/wezterm.nvim',
+        cond = vim.fn.executable('wezterm') == 1,
         config = true
     },
 
