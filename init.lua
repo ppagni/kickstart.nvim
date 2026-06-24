@@ -253,12 +253,16 @@ end
 -- ============================================================
 
 -- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local out = vim.fn.system({
-    'git', 'clone', '--filter=blob:none', '--branch=stable',
-    'https://github.com/folke/lazy.nvim.git', lazypath,
-  })
+  local out = vim.fn.system {
+    'git',
+    'clone',
+    '--filter=blob:none',
+    '--branch=stable',
+    'https://github.com/folke/lazy.nvim.git',
+    lazypath,
+  }
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({ { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' }, { out, 'WarningMsg' }, { '\nPress any key to exit...' } }, true, {})
     vim.fn.getchar()
@@ -267,7 +271,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup({
+require('lazy').setup {
   spec = {
     -- ============================================================
     -- SECTION 3: UI / CORE UX PLUGINS
@@ -340,7 +344,7 @@ require('lazy').setup({
         {
           'nvim-telescope/telescope-fzf-native.nvim',
           build = 'make',
-          cond = vim.fn.executable('make') == 1,
+          cond = vim.fn.executable 'make' == 1,
         },
       },
       config = function()
@@ -378,13 +382,19 @@ require('lazy').setup({
           end,
         })
 
-        vim.keymap.set('n', '<leader>/', function()
-          builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown { winblend = 10, previewer = false })
-        end, { desc = '[/] Fuzzily search in current buffer' })
+        vim.keymap.set(
+          'n',
+          '<leader>/',
+          function() builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown { winblend = 10, previewer = false }) end,
+          { desc = '[/] Fuzzily search in current buffer' }
+        )
 
-        vim.keymap.set('n', '<leader>s/', function()
-          builtin.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' }
-        end, { desc = '[S]earch [/] in Open Files' })
+        vim.keymap.set(
+          'n',
+          '<leader>s/',
+          function() builtin.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' } end,
+          { desc = '[S]earch [/] in Open Files' }
+        )
 
         vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = '[S]earch [N]eovim files' })
       end,
@@ -506,27 +516,37 @@ require('lazy').setup({
     {
       'stevearc/conform.nvim',
       config = function()
+        local prettier_ft = {
+          'javascript',
+          'javascriptreact',
+          'typescript',
+          'typescriptreact',
+          'vue',
+          'css',
+          'scss',
+          'less',
+          'html',
+          'json',
+          'jsonc',
+          'yaml',
+          'markdown',
+          'graphql',
+        }
+        local formatters_by_ft = {}
+        for _, ft in ipairs(prettier_ft) do
+          formatters_by_ft[ft] = { 'prettierd', 'prettier', stop_after_first = true }
+        end
+
         require('conform').setup {
           notify_on_error = false,
           format_on_save = function(bufnr)
-            local enabled_filetypes = {
-              -- lua = true,
-              -- python = true,
-            }
-            if enabled_filetypes[vim.bo[bufnr].filetype] then
-              return { timeout_ms = 500 }
-            else
-              return nil
-            end
+            if formatters_by_ft[vim.bo[bufnr].filetype] then return { timeout_ms = 500, lsp_format = 'fallback' } end
+            return nil
           end,
           default_format_opts = {
             lsp_format = 'fallback',
           },
-          formatters_by_ft = {
-            -- rust = { 'rustfmt' },
-            -- python = { "isort", "black" },
-            -- javascript = { "prettierd", "prettier", stop_after_first = true },
-          },
+          formatters_by_ft = formatters_by_ft,
         }
         vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
       end,
@@ -539,7 +559,7 @@ require('lazy').setup({
     {
       'L3MON4D3/LuaSnip',
       version = '2.*',
-      build = (vim.fn.has('win32') ~= 1 and vim.fn.executable('make') == 1) and 'make install_jsregexp' or nil,
+      build = (vim.fn.has 'win32' ~= 1 and vim.fn.executable 'make' == 1) and 'make install_jsregexp' or nil,
       config = function()
         require('luasnip').setup {}
         -- vim.pack.add { gh 'rafamadriz/friendly-snippets' }
@@ -632,11 +652,10 @@ require('lazy').setup({
 
   install = { colorscheme = { 'gruvbox-medium', 'habamax' } },
   checker = { enabled = false },
-})
+}
 
-    -- Open Oil in a floating window
-    vim.keymap.set("n", "<leader>of", "<CMD>Oil --float<CR>", { desc = "Open Oil float" })
-
+-- Open Oil in a floating window
+vim.keymap.set('n', '<leader>of', '<CMD>Oil --float<CR>', { desc = 'Open Oil float' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
