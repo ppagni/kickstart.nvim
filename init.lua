@@ -652,10 +652,17 @@ require('lazy').setup {
 
   install = { colorscheme = { 'gruvbox-medium', 'habamax' } },
   checker = { enabled = false },
-}
+})
 
 -- Open Oil in a floating window
-vim.keymap.set('n', '<leader>of', '<CMD>Oil --float<CR>', { desc = 'Open Oil float' })
+vim.keymap.set("n", "<leader>of", "<CMD>Oil --float<CR>", { desc = "Open Oil float" })
+vim.keymap.set("n", "<leader>ob", "<CMD>Oil<CR>", { desc = "Open Oil" })
+
+-- Insert a tick with \ok
+vim.keymap.set("i", "<leader>ok", "✓")
+
+-- Insert a cross with \xx
+vim.keymap.set("i", "<leader>xx", "✗")
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
